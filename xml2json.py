@@ -1,15 +1,26 @@
 # -*- coding: utf-8 -*-
 import xml.etree.cElementTree as ET
+import xmltodict
+import json
+import datetime
+from lxml import etree
 
 
 BIOPROJECT_CONF = {
     "ftp_url": "ftp.ncbi.nlm.nih.gov",
     "ftp_file_path": "bioproject",
-    "xml_file_name": "bioproject.xml",
-    "local_file_path": "/home/ubuntu/data",
-    "solr_path": "http://localhost:8983/solr/bioproject/",
-    "dih_path": "http://localhost:8983/solr/bioproject/dataimport"
+
 }
+
+def xml2json(xml_str):
+    json_doc = xmltodict.parse(xml_str, dict_constructor=dict, force_cdata=True, cdata_key='$')
+    return json.dumps(json_doc)
+
+
+def clear_element(element):
+    element.clear()
+    while element.getprevious() is not None:
+        del element.getparent()[0]
 
 
 def save_metadata():
@@ -17,13 +28,13 @@ def save_metadata():
     target_file = "/".join([BIOPROJECT_CONF["local_file_path"], BIOPROJECT_CONF["xml_file_name"]])
     context = etree.iterparse(target_file, tag="Package")
 
-    target_db = DB_CONF["metadata"]["bioproject_tmp"]
     i = 0
     docs = []
     for events, element in context:
         if element.tag == "Package":
             doc = {}
-            doc["_id"] = element.find(".//Project/Project/ProjectID/ArchiveID").attrib["accession"]
+            doc["identifier"] = element.find(".//Project/Project/ProjectID/ArchiveID").attrib["accession"]
+            # Todo: ESは"_id"が設定されている必要があるはず
             xml_str = etree.tostring(element)
             metadata = xml2json(xml_str)
             doc["metadata"] = metadata
@@ -32,11 +43,13 @@ def save_metadata():
             i += 1
 
         clear_element(element)
+        # 以下mongoを使った場合のchunk処理
+        """
         if i > 1000:
             i = 0
             db_connect[target_db].insert_many(docs)
             docs = []
-
+        """
 
 def study(p,f):
     """
