@@ -34,6 +34,23 @@ class DefaultDictVal:
         except:
             attr = ""
         return attr
+    
+    def get_xattrs(self, elem, path):
+        try:
+            attrs = elem.xpath(path)
+        except:
+            attrs = []
+        return attrs
+
+    def get_publications(self, elem, path):
+        try:
+            e = elem.findall(path)
+            # obj = [x.attrib["id"] for x in e]
+            # obj = [x.xpath(".//Title")[0].text for x in e]
+            obj = [{"id":x.attrib["id"], "Title": x.xpath(".//Title")[0].text} for x in e]
+        except:
+            obj = None
+        return obj
 
     def get_chld(self, elem, path):
         try:

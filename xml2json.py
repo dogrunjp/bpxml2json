@@ -5,6 +5,9 @@ import json
 import datetime
 from lxml import etree
 
+import xmlutils
+import defaultdictvals
+
 
 BIOPROJECT_CONF = {
     "ftp_url": "ftp.ncbi.nlm.nih.gov",
@@ -12,9 +15,15 @@ BIOPROJECT_CONF = {
 
 }
 
-def xml2json(xml_str):
+
+def xml2json(xml_str, output_path):
     json_doc = xmltodict.parse(xml_str, dict_constructor=dict, force_cdata=True, cdata_key='$')
     return json.dumps(json_doc)
+
+
+def save_json(json_str, output_path):
+    with open(output_path) as f:
+        json.dump(json_str, f, indent=2, ensure_ascii=False)
 
 
 def clear_element(element):
@@ -23,33 +32,72 @@ def clear_element(element):
         del element.getparent()[0]
 
 
-def save_metadata():
+def bioproject_xml_to_dict(file_path:str, output_path:str):
+    """
+    bioproject.xmlのうち設定された要素をフラットなxmlとしてJSONに変換して書き出す
+    :param file_path: bioproject.xmlのパス
+    :param output_path: 書き出すJSONファイル名
+    :return: void
+    """
     # Todo: DDBJ のBioProjectのハッシュテーブルの要素を追加する
-    target_file = "/".join([BIOPROJECT_CONF["local_file_path"], BIOPROJECT_CONF["xml_file_name"]])
-    context = etree.iterparse(target_file, tag="Package")
+    context = etree.iterparse(file_path, tag="Package", recover=True)
+    dd = defaultdictvals.DefaultDictVal()
 
-    i = 0
     docs = []
     for events, element in context:
         if element.tag == "Package":
             doc = {}
-            doc["identifier"] = element.find(".//Project/Project/ProjectID/ArchiveID").attrib["accession"]
-            # Todo: ESは"_id"が設定されている必要があるはず
-            xml_str = etree.tostring(element)
-            metadata = xml2json(xml_str)
-            doc["metadata"] = metadata
-            doc["submit_date"] = datetime.datetime.today()
-            docs.append(doc)
-            i += 1
+            doc["type"] = "bioproject"
+            doc["identifier"] = dd.get_xattr(element, ".//ProjectID/ArchiveID/@accession")
+            doc["organism"] = dd.get_value(element, ".//Project/Project/ProjectDescr/Name")
+            doc["title"] = dd.get_value(element, ".//Project/Project/ProjectDescr/Title")
+            doc["description"] = dd.get_value(element, ".//Project/ProjectDescr/Description")
+            doc["data type"] = dd.get_value(element, ".//ProjectTypeSubmission/ProjectDataTypeSet/DataType")
+            doc["organization"] = dd.get_value(element, ".//Submission/Description/Organization/Name")
+            doc["publication"] = dd.get_publications(element, ".//Project/ProjectDescr/Publication")
+            doc["properties"] = None
+            doc["dbXrefs"] = dd.get_xattrs(element, ".//Project/ProjectDescr/LocusTagPrefix/@biosample_id")
+            doc["distribution"] = None
+            doc["Download"] = None
+            doc["status"] = dd.get_value(element, ".//Submission/Description/Access")
+            doc["visibility"] = None
+            doc["dateCreated"] = dd.get_xattr(element, ".//Submission/@submitted")
+            doc["dateModified"] = dd.get_xattr(element, ".//Submission/@last_update")
+            doc["datePublished"] = dd.get_value(element, ".//Project/ProjectDescr/ProjectReleaseDate ")
 
-        clear_element(element)
-        # 以下mongoを使った場合のchunk処理
-        """
-        if i > 1000:
-            i = 0
-            db_connect[target_db].insert_many(docs)
-            docs = []
-        """
+            # そのままxmltodictで機械的にJSONに変換したい場合以下を実行すしリストに追加する
+            # ただしxmlが部分的にでもマルフォームであった場合エラーが発生する
+            # xml_str = etree.tostring(element)
+            # metadata = xml2json(xml_str)
+            docs.append(doc)
+
+        try:
+            clear_element(element)
+        except TypeError:
+            pass
+        '''
+        # for test 
+        if i > 10:
+            res = {"bioproject": docs}
+            with open(output_path, "w") as f:
+                json.dump(res, f, indent=4)
+
+            break
+        '''
+    with open(output_path, "w") as f:
+        json.dump(docs, f, indent=4)
+
+
+def bioproject_xml_to_json(file_path: str, output_path:str):
+    """
+    bioproject.xmlを機械的に階層構造を保ったままJSONに変換して書き出す
+    :param file_path:
+    :param output_path:
+    :return:
+    """
+    root = xmlutils.read_xml_string(file_path)
+    xml2json(root, output_path)
+
 
 def study(p,f):
     """
@@ -85,3 +133,7 @@ def study(p,f):
             #putdata = PutData()
             putmetadata.putvalues(vals, metadata)
             clear_element(element)
+
+
+if __name__ == "__main__":
+    bioproject_xml_to_dict("/mnt/sra/xml/bioproject.xml", "test_json.json")
