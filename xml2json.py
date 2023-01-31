@@ -5,6 +5,9 @@ import json
 import datetime
 from lxml import etree
 
+import xmlutils
+
+
 
 BIOPROJECT_CONF = {
     "ftp_url": "ftp.ncbi.nlm.nih.gov",
@@ -12,9 +15,12 @@ BIOPROJECT_CONF = {
 
 }
 
-def xml2json(xml_str):
+
+def xml2json(xml_str, output_path):
     json_doc = xmltodict.parse(xml_str, dict_constructor=dict, force_cdata=True, cdata_key='$')
-    return json.dumps(json_doc)
+    #return json.dumps(json_doc)
+    with open(output_path) as f:
+        json.dump(json_doc, f, indent=2, ensure_ascii=False)
 
 
 def clear_element(element):
@@ -23,7 +29,13 @@ def clear_element(element):
         del element.getparent()[0]
 
 
-def save_metadata():
+def bioproject_xml_to_dict(file_path:str, output_path:str):
+    """
+    bioproject.xmlのうち設定された要素をフラットなxmlとしてJSONに変換して書き出す
+    :param file_path: bioproject.xmlのパス
+    :param output_path: 書き出すJSONファイル名
+    :return: void
+    """
     # Todo: DDBJ のBioProjectのハッシュテーブルの要素を追加する
     target_file = "/".join([BIOPROJECT_CONF["local_file_path"], BIOPROJECT_CONF["xml_file_name"]])
     context = etree.iterparse(target_file, tag="Package")
@@ -50,6 +62,19 @@ def save_metadata():
             db_connect[target_db].insert_many(docs)
             docs = []
         """
+
+def bioproject_xml_to_json(file_path: str, output_path:str):
+    """
+    bioproject.xmlを機械的に階層構造を保ったままJSONに変換して書き出す
+    :param file_path:
+    :param output_path:
+    :return:
+    """
+    root = xmlutils.read_xml_string(file_path)
+    xml2json(root, output_path)
+
+
+
 
 def study(p,f):
     """
@@ -85,3 +110,7 @@ def study(p,f):
             #putdata = PutData()
             putmetadata.putvalues(vals, metadata)
             clear_element(element)
+
+
+if __name__ == "__main__":
+    bioproject_xml_to_json("/mnt/sra/xml/bioproject_fixed.xml", "test_json.json")
