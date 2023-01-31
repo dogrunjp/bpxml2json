@@ -31,9 +31,12 @@ def find_element(file_path:str):
             # Todo: ESは"_id"が設定されている必要があるはず
             xml_str = etree.tostring(element)
             if doc["identifier"] == "PRJNA3":
-                pretty = etree.tostring(element, encoding="utf-8", pretty_print=True)
+                pretty = etree.tostring(element, encoding="utf-8", pretty_print=True).decode()
                 print(pretty)
-                break
+                # ファイルに書き出す場合
+                et = etree.ElementTree(element)
+                et.write('test_print', pretty_print=True)
+            break
 
         clear_element(element)
 
