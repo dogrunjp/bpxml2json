@@ -40,9 +40,8 @@ def bioproject_xml_to_dict(file_path:str, output_path:str):
     :return: void
     """
     # Todo: DDBJ のBioProjectのハッシュテーブルの要素を追加する
-    target_file = "/".join([BIOPROJECT_CONF["local_file_path"], BIOPROJECT_CONF["xml_file_name"]])
-    context = etree.iterparse(target_file, tag="Package")
-    dd = DefaultDictVal()
+    context = etree.iterparse(file_path, tag="Package")
+    dd = defaultdictvals.DefaultDictVal()
 
     i = 0
     docs = []
@@ -50,25 +49,22 @@ def bioproject_xml_to_dict(file_path:str, output_path:str):
         if element.tag == "Package":
             doc = {}
             doc["type"] = "bioproject"
-            doc["identifier"] = dd.get_xattr(element, ".//Project/Project/ProjectID/ArchiveID@accession")
+            doc["identifier"] = dd.get_xattr(element, ".//ProjectID/ArchiveID/@accession")
             doc["organism"] = dd.get_value(element, ".//Project/Project/ProjectDescr/Name")
             doc["title"] = dd.get_value(element, ".//Project/Project/ProjectDescr/Title")
             doc["description"] = dd.get_value(element, ".//Project/ProjectDescr/Description")
             doc["data type"] = dd.get_value(element, ".//ProjectTypeSubmission/ProjectDataTypeSet/DataType")
             doc["organization"] = dd.get_value(element, ".//Submission/Description/Organization/Name")
-            doc["publication"] = dd.get_xattrs(element, ".//Project/ProjectDescr/Publication@id")
+            doc["publication"] = dd.get_xattrs(element, ".//Project/ProjectDescr/Publication/@id")
             doc["properties"] = None
             doc["dbXrefs"] = dd.get_value(element, ".//Project/ProjectDescr/LocusTagPrefex")
             doc["distribution"] = None
             doc["Download"] = None
             doc["status"] = dd.get_value(element, ".//Submission/Description/Access")
             doc["visibility"] = None
-            doc["dateCreated"] = dd.get_xattr(element, ".//Submission@submitted")
-            doc["dateModified"] = dd.get_xattr(element, ".//Submission@last_update")
+            doc["dateCreated"] = dd.get_xattr(element, ".//Submission/@submitted")
+            doc["dateModified"] = dd.get_xattr(element, ".//Submission/@last_update")
             doc["datePublished"] = dd.get_value(element, ".//Project/ProjectDescr/ProjectReleaseDate ")
-
-
-            # Todo: ESは"_id"が設定されている必要があるはず
             #xml_str = etree.tostring(element)
             #metadata = xml2json(xml_str)
             docs.append(doc)
@@ -76,12 +72,13 @@ def bioproject_xml_to_dict(file_path:str, output_path:str):
 
         clear_element(element)
         # 以下mongoを使った場合のchunk処理
-        """
         if i > 1000:
-            i = 0
-            db_connect[target_db].insert_many(docs)
-            docs = []
-        """
+            res = {"bioproject": docs}
+            with open(output_path, "w") as f:
+                json.dump(res, f, indent=4)
+
+            break
+
 
 def bioproject_xml_to_json(file_path: str, output_path:str):
     """
@@ -131,4 +128,4 @@ def study(p,f):
 
 
 if __name__ == "__main__":
-    bioproject_xml_to_json("/mnt/sra/xml/bioproject_fixed.xml", "test_json.json")
+    bioproject_xml_to_dict("/mnt/sra/xml/bioproject.xml", "test_json.json")
