@@ -21,7 +21,7 @@ def bioproject_by_id(bp: xml, id:str) -> xml:
 
 
 def test_node_select():
-    r = read_xml_string("bioproject.xml")
+    r = read_xml_string("/mnt/sra/xml/bioproject_fixed.xml")
     bioproject_by_id(r, "PRJNA3")
 
 
