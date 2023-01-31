@@ -71,7 +71,6 @@ def bioproject_xml_to_dict(file_path:str, output_path:str):
             # xml_str = etree.tostring(element)
             # metadata = xml2json(xml_str)
             docs.append(doc)
-            i += 1
 
         try:
             clear_element(element)
