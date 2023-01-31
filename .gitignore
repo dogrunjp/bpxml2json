@@ -7,3 +7,5 @@
 *.iml
 .DS_store
 memo/
+*.json
+__pycache__

@@ -40,7 +40,7 @@ def bioproject_xml_to_dict(file_path:str, output_path:str):
     :return: void
     """
     # Todo: DDBJ のBioProjectのハッシュテーブルの要素を追加する
-    context = etree.iterparse(file_path, tag="Package")
+    context = etree.iterparse(file_path, tag="Package", recover=True)
     dd = defaultdictvals.DefaultDictVal()
 
     i = 0
@@ -55,9 +55,9 @@ def bioproject_xml_to_dict(file_path:str, output_path:str):
             doc["description"] = dd.get_value(element, ".//Project/ProjectDescr/Description")
             doc["data type"] = dd.get_value(element, ".//ProjectTypeSubmission/ProjectDataTypeSet/DataType")
             doc["organization"] = dd.get_value(element, ".//Submission/Description/Organization/Name")
-            doc["publication"] = dd.get_xattrs(element, ".//Project/ProjectDescr/Publication/@id")
+            doc["publication"] = dd.get_publications(element, ".//Project/ProjectDescr/Publication")
             doc["properties"] = None
-            doc["dbXrefs"] = dd.get_value(element, ".//Project/ProjectDescr/LocusTagPrefex")
+            doc["dbXrefs"] = dd.get_xattrs(element, ".//Project/ProjectDescr/LocusTagPrefix/@biosample_id")
             doc["distribution"] = None
             doc["Download"] = None
             doc["status"] = dd.get_value(element, ".//Submission/Description/Access")
@@ -65,19 +65,29 @@ def bioproject_xml_to_dict(file_path:str, output_path:str):
             doc["dateCreated"] = dd.get_xattr(element, ".//Submission/@submitted")
             doc["dateModified"] = dd.get_xattr(element, ".//Submission/@last_update")
             doc["datePublished"] = dd.get_value(element, ".//Project/ProjectDescr/ProjectReleaseDate ")
-            #xml_str = etree.tostring(element)
-            #metadata = xml2json(xml_str)
+
+            # そのままxmltodictで機械的にJSONに変換したい場合以下を実行すしリストに追加する
+            # ただしxmlが部分的にでもマルフォームであった場合エラーが発生する
+            # xml_str = etree.tostring(element)
+            # metadata = xml2json(xml_str)
             docs.append(doc)
             i += 1
 
-        clear_element(element)
-        # 以下mongoを使った場合のchunk処理
-        if i > 1000:
+        try:
+            clear_element(element)
+        except TypeError:
+            pass
+        '''
+        # for test 
+        if i > 10:
             res = {"bioproject": docs}
             with open(output_path, "w") as f:
                 json.dump(res, f, indent=4)
 
             break
+        '''
+    with open(output_path, "w") as f:
+        json.dump(docs, f, indent=4)
 
 
 def bioproject_xml_to_json(file_path: str, output_path:str):
