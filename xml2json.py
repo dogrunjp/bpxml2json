@@ -6,7 +6,7 @@ import datetime
 from lxml import etree
 
 import xmlutils
-
+import defaultdictvals
 
 
 BIOPROJECT_CONF = {
@@ -18,9 +18,12 @@ BIOPROJECT_CONF = {
 
 def xml2json(xml_str, output_path):
     json_doc = xmltodict.parse(xml_str, dict_constructor=dict, force_cdata=True, cdata_key='$')
-    #return json.dumps(json_doc)
+    return json.dumps(json_doc)
+
+
+def save_json(json_str, output_path):
     with open(output_path) as f:
-        json.dump(json_doc, f, indent=2, ensure_ascii=False)
+        json.dump(json_str, f, indent=2, ensure_ascii=False)
 
 
 def clear_element(element):
@@ -39,18 +42,35 @@ def bioproject_xml_to_dict(file_path:str, output_path:str):
     # Todo: DDBJ のBioProjectのハッシュテーブルの要素を追加する
     target_file = "/".join([BIOPROJECT_CONF["local_file_path"], BIOPROJECT_CONF["xml_file_name"]])
     context = etree.iterparse(target_file, tag="Package")
+    dd = DefaultDictVal()
 
     i = 0
     docs = []
     for events, element in context:
         if element.tag == "Package":
             doc = {}
-            doc["identifier"] = element.find(".//Project/Project/ProjectID/ArchiveID").attrib["accession"]
+            doc["type"] = "bioproject"
+            doc["identifier"] = dd.get_xattr(element, ".//Project/Project/ProjectID/ArchiveID@accession")
+            doc["organism"] = dd.get_value(element, ".//Project/Project/ProjectDescr/Name")
+            doc["title"] = dd.get_value(element, ".//Project/Project/ProjectDescr/Title")
+            doc["description"] = dd.get_value(element, ".//Project/ProjectDescr/Description")
+            doc["data type"] = dd.get_value(element, ".//ProjectTypeSubmission/ProjectDataTypeSet/DataType")
+            doc["organization"] = dd.get_value(element, ".//Submission/Description/Organization/Name")
+            doc["publication"] = dd.get_xattrs(element, ".//Project/ProjectDescr/Publication@id")
+            doc["properties"] = None
+            doc["dbXrefs"] = dd.get_value(element, ".//Project/ProjectDescr/LocusTagPrefex")
+            doc["distribution"] = None
+            doc["Download"] = None
+            doc["status"] = dd.get_value(element, ".//Submission/Description/Access")
+            doc["visibility"] = None
+            doc["dateCreated"] = dd.get_xattr(element, ".//Submission@submitted")
+            doc["dateModified"] = dd.get_xattr(element, ".//Submission@last_update")
+            doc["datePublished"] = dd.get_value(element, ".//Project/ProjectDescr/ProjectReleaseDate ")
+
+
             # Todo: ESは"_id"が設定されている必要があるはず
-            xml_str = etree.tostring(element)
-            metadata = xml2json(xml_str)
-            doc["metadata"] = metadata
-            doc["submit_date"] = datetime.datetime.today()
+            #xml_str = etree.tostring(element)
+            #metadata = xml2json(xml_str)
             docs.append(doc)
             i += 1
 
@@ -72,8 +92,6 @@ def bioproject_xml_to_json(file_path: str, output_path:str):
     """
     root = xmlutils.read_xml_string(file_path)
     xml2json(root, output_path)
-
-
 
 
 def study(p,f):
