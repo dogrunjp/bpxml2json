@@ -7,5 +7,5 @@
 *.iml
 .DS_store
 memo/
-*.json
+bioproject.json
 __pycache__
