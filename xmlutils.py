@@ -54,4 +54,4 @@ def test_iterparse():
 
 
 if __name__ == "__main__":
-    test_node_select()
+    test_iterparse()
