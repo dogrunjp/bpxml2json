@@ -4,7 +4,7 @@ bioproject.xmlをDDBJハッシュテーブルの項目に合わせたJSONに変�
 
 ## 使い方と実施結果
 
-開発途中のため読み込み・書き出しパスはxml2json.pyにハードコード（139行目）したままです。
+開発途中のため読み込み・書き出しパスはxml2json.pyにハードコード（103行目）したままです。
 
 ```
 $ time python xml2json.py                                                      
