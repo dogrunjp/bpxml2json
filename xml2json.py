@@ -136,4 +136,4 @@ def study(p,f):
 
 
 if __name__ == "__main__":
-    bioproject_xml_to_dict("/mnt/sra/xml/bioproject.xml", "test_json.json")
+    bioproject_xml_to_dict("biproject.xml", "biproject.json")
