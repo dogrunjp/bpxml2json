@@ -42,7 +42,7 @@ def bioproject_xml_to_dict(file_path:str, output_path:str):
     # Todo: DDBJ のBioProjectのハッシュテーブルの要素を追加する
     context = etree.iterparse(file_path, tag="Package", recover=True)
     dd = defaultdictvals.DefaultDictVal()
-
+    i = 0
     docs = []
     for events, element in context:
         if element.tag == "Package":
@@ -75,17 +75,17 @@ def bioproject_xml_to_dict(file_path:str, output_path:str):
             clear_element(element)
         except TypeError:
             pass
-        '''
-        # for test 
-        if i > 10:
+
+        # for test
+        if i > 1:
             res = {"bioproject": docs}
             with open(output_path, "w") as f:
                 json.dump(res, f, indent=4)
 
             break
-        '''
-    with open(output_path, "w") as f:
-        json.dump(docs, f, indent=4)
+
+    #with open(output_path, "w") as f:
+        #json.dump(docs, f, indent=4)
 
 
 def bioproject_xml_to_json(file_path: str, output_path:str):
