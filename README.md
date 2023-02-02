@@ -1,10 +1,11 @@
 # bpxml2json
 
 bioproject.xmlをDDBJハッシュテーブルの項目に合わせたJSONに変換するユーティリティです。
+ElasticSearchにbulk importするためのjsonl形式の書き出しにも対応しています。
 
 ## 使い方と実施結果
 
-開発途中のため読み込み・書き出しパスはxml2json.pyにハードコード（103行目）したままです。
+開発途中のため読み込み・書き出しパスはxml2json.pyにハードコード（108行目）したままです。
 
 ```
 $ time python xml2json.py                                                      
