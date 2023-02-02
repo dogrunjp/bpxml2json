@@ -38,10 +38,9 @@ def bioproject_xml_to_dict(file_path:str, output_path:str):
     :param output_path: 書き出すJSONファイル名
     :return: void
     """
-    # Todo: DDBJ のBioProjectのハッシュテーブルの要素を追加する
     context = etree.iterparse(file_path, tag="Package", recover=True)
     dd = defaultdictvals.DefaultDictVal()
-    #i = 0
+    # i = 0
     docs = []
     for events, element in context:
         if element.tag == "Package":
@@ -87,7 +86,7 @@ def bioproject_xml_to_dict(file_path:str, output_path:str):
         '''
     # JSONを書き出す場合
     write_json(output_path, docs)
-    
+
 
 def bioproject_xml_to_json(file_path: str, output_path:str):
     """
@@ -106,4 +105,4 @@ def write_json(out_path:str, docs: dict):
 
 
 if __name__ == "__main__":
-    bioproject_xml_to_dict("biproject.xml", "biproject.json")
+    bioproject_xml_to_dict("/bioproject.xml", "biproject.json")
