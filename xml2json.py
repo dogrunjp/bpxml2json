@@ -5,6 +5,7 @@ from lxml import etree
 
 import xmlutils
 import defaultdictvals
+import xml2jsonl
 
 
 BIOPROJECT_CONF = {
@@ -68,7 +69,9 @@ def bioproject_xml_to_dict(file_path:str, output_path:str):
             # xml_str = etree.tostring(element)
             # metadata = xml2json(xml_str)
             docs.append(doc)
-            #i += 1
+
+            # jsonlを書き出す場合
+            xml2jsonl.dict2jsnl(doc, "bioproject", "test.jsonl")
 
         try:
             clear_element(element)
@@ -76,16 +79,13 @@ def bioproject_xml_to_dict(file_path:str, output_path:str):
             pass
 
         '''
-        if i > 1:
+        if i > 10:
             res = {"bioproject": docs}
-            with open(output_path, "w") as f:
-                json.dump(res, f, indent=4)
-
+            write_json(output_path, docs)
             break
+        i += 1
         '''
-
-    with open(output_path, "w") as f:
-        json.dump(docs, f, indent=4)
+    write_json(output_path, docs)
     
 
 def bioproject_xml_to_json(file_path: str, output_path:str):
@@ -97,6 +97,11 @@ def bioproject_xml_to_json(file_path: str, output_path:str):
     """
     root = xmlutils.read_xml_string(file_path)
     xml2json(root, output_path)
+
+
+def write_json(out_path:str, docs: dict):
+    with open(out_path, "w") as f:
+        json.dump(docs, f, indent=4)
 
 
 if __name__ == "__main__":

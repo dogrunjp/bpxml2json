@@ -3,7 +3,7 @@ import json
 from datetime import datetime, date
 
 
-def json2jsnl(dct, data_type, output_f):
+def dict2jsnl(dct, data_type, output_f):
     """
     XMLから変換したdictをElasticSearcchにバルクインポートするためのjsonl形式のファイルに整形して書き出す。
     xml2jsonからelementごとに随時ファイルに書き出しを行う
