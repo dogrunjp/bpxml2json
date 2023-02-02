@@ -71,7 +71,7 @@ def bioproject_xml_to_dict(file_path:str, output_path:str):
             docs.append(doc)
 
             # jsonlを書き出す場合
-            xml2jsonl.dict2jsnl(doc, "bioproject", "test.jsonl")
+            # xml2jsonl.dict2jsnl(doc, "bioproject", f"{output_path}l")
 
         try:
             clear_element(element)
@@ -85,6 +85,7 @@ def bioproject_xml_to_dict(file_path:str, output_path:str):
             break
         i += 1
         '''
+    # JSONを書き出す場合
     write_json(output_path, docs)
     
 

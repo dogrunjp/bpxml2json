@@ -12,9 +12,10 @@ def dict2jsnl(dct, data_type, output_f):
     :param output_f:
     :return:
     """
-    writer = open(output_f, "w")
+    # 追記するのでモードで"a"を指定する
+    writer = open(output_f, "a")
     obj = {data_type: dct}
-    acc = obj["identifier"]
+    acc = dct["identifier"]
 
     h = json.dumps({"index": {"_index": data_type, "_type": "metadata", "_id": acc}})
     writer.write(h)
