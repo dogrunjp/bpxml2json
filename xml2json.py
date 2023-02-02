@@ -68,6 +68,7 @@ def bioproject_xml_to_dict(file_path:str, output_path:str):
             # xml_str = etree.tostring(element)
             # metadata = xml2json(xml_str)
             docs.append(doc)
+            #i += 1
 
         try:
             clear_element(element)
@@ -75,18 +76,17 @@ def bioproject_xml_to_dict(file_path:str, output_path:str):
             pass
 
         '''
-        # for test
         if i > 1:
             res = {"bioproject": docs}
             with open(output_path, "w") as f:
                 json.dump(res, f, indent=4)
 
             break
-            '''
+        '''
 
     with open(output_path, "w") as f:
         json.dump(docs, f, indent=4)
-
+    
 
 def bioproject_xml_to_json(file_path: str, output_path:str):
     """

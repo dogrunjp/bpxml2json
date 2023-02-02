@@ -1,0 +1,86 @@
+{
+    "bioproject": [
+        {
+            "type": "bioproject",
+            "identifier": "PRJNA3",
+            "organism": "Borreliella burgdorferi B31",
+            "title": "Causes Lyme disease",
+            "description": "<P>\n<I><B>Borrelia burgdorferi</I> strain B31</B>. This is the type strain (ATCC 35210) for this organism and was derived by limited dilutional cloning from the original Lyme-disease tick isolate derived by A. Barbour.",
+            "data type": "Genome sequencing",
+            "organization": "TIGR",
+            "publication": [
+                {
+                    "id": "14731275",
+                    "Title": "Cross-species hybridization of a Borrelia burgdorferi DNA array reveals infection- and culture-associated genes of the unsequenced genome of the relapsing fever agent Borrelia hermsii."
+                },
+                {
+                    "id": "9403685",
+                    "Title": "Genomic sequence of a Lyme disease spirochaete, Borrelia burgdorferi."
+                },
+                {
+                    "id": "10672174",
+                    "Title": "A bacterial genome in flux: the twelve linear and nine circular extrachromosomal DNAs in an infectious isolate of the Lyme disease spirochete Borrelia burgdorferi."
+                }
+            ],
+            "properties": null,
+            "dbXrefs": [
+                "SAMN02603966",
+                "SAMN11044051",
+                "SAMN11044052",
+                "SAMN11044053",
+                "SAMN11044054",
+                "SAMN11044055",
+                "SAMN11044056",
+                "SAMN11044057",
+                "SAMN11044058",
+                "SAMN11044059",
+                "SAMN11044060",
+                "SAMN11044061",
+                "SAMN11044062",
+                "SAMN11044063",
+                "SAMN11044064",
+                "SAMN11044065",
+                "SAMN11044066",
+                "SAMN11044067",
+                "SAMN11044068",
+                "SAMN11044069",
+                "SAMN11044070",
+                "SAMN19513661"
+            ],
+            "distribution": null,
+            "Download": null,
+            "status": "public",
+            "visibility": null,
+            "dateCreated": "2003-02-23",
+            "dateModified": "",
+            "datePublished": "2001-01-09T00:00:00Z"
+        },
+        {
+            "type": "bioproject",
+            "identifier": "PRJNA4",
+            "organism": "Treponema denticola ATCC 35405",
+            "title": "Causes periodontal disease, gum inflamation",
+            "description": "<P><I><B>Treponema denticola</I> ATCC 35405</B>. <I>Treponema denticola</I> ATCC 35405 was isolated from a human periodontal pocket and is the type strain of this organism.",
+            "data type": "Genome sequencing",
+            "organization": "TIGR",
+            "publication": [
+                {
+                    "id": "15064399",
+                    "Title": "Comparison of the genome of the oral pathogen Treponema denticola with other spirochete genomes."
+                }
+            ],
+            "properties": null,
+            "dbXrefs": [
+                "SAMN19513662",
+                "SAMN02603967"
+            ],
+            "distribution": null,
+            "Download": null,
+            "status": "public",
+            "visibility": null,
+            "dateCreated": "2003-02-25",
+            "dateModified": "",
+            "datePublished": "2004-02-03T00:00:00Z"
+        }
+    ]
+}
