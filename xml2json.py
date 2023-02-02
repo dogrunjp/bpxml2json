@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
-import xml.etree.cElementTree as ET
 import xmltodict
 import json
-import datetime
 from lxml import etree
 
 import xmlutils

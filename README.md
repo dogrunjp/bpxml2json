@@ -1,6 +1,6 @@
 # bpxml2json
 
-bioproject.xmlをDDBJハッシュテーブルの項目に合わせたJSONに変換するスクリプトです。
+bioproject.xmlをDDBJハッシュテーブルの項目に合わせたJSONに変換するユーティリティです。
 
 ## 使い方と実施結果
 
