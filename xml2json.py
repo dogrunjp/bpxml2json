@@ -59,9 +59,13 @@ def bioproject_xml_to_dict(file_path:str, output_path:str):
             doc["Download"] = None
             doc["status"] = dd.get_value(element, ".//Submission/Description/Access")
             doc["visibility"] = None
-            doc["dateCreated"] = dd.get_xattr(element, ".//Submission/@submitted")
-            doc["dateModified"] = dd.get_xattr(element, ".//Submission/@last_update")
-            doc["datePublished"] = dd.get_value(element, ".//Project/ProjectDescr/ProjectReleaseDate ")
+            # Todo: 以下ElasticSearchの項目がDate型なため空の値を登録できない（レコードのインポートがエラーとなりスキップされる）
+            date_created = dd.get_xattr(element, ".//Submission/@submitted")
+            if date_created: doc["dateCreated"] = date_created
+            date_mmodified = dd.get_xattr(element, ".//Submission/@last_update")
+            if date_mmodified: doc["dateModified"] = date_mmodified
+            date_published = dd.get_value(element, ".//Project/ProjectDescr/ProjectReleaseDate")
+            if date_published: doc["datePublished"] = date_published
 
             # そのままxmltodictで機械的にJSONに変換したい場合以下を実行すしリストに追加する
             # ただしxmlが部分的にでもマルフォームであった場合エラーが発生する
