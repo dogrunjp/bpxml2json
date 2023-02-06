@@ -6,6 +6,7 @@ from lxml import etree
 import xmlutils
 import defaultdictvals
 import xml2jsonl
+import select_by_acc
 
 
 BIOPROJECT_CONF = {
@@ -38,6 +39,10 @@ def bioproject_xml_to_dict(file_path:str, output_path:str):
     :param output_path: 書き出すJSONファイル名
     :return: void
     """
+
+    # bioproject accのリストによるfilterを追加する場合
+    acc = select_by_acc.load_acc()
+
     context = etree.iterparse(file_path, tag="Package", recover=True)
     dd = defaultdictvals.DefaultDictVal()
     # i = 0
@@ -47,34 +52,42 @@ def bioproject_xml_to_dict(file_path:str, output_path:str):
             doc = {}
             doc["type"] = "bioproject"
             doc["identifier"] = dd.get_xattr(element, ".//ProjectID/ArchiveID/@accession")
-            doc["organism"] = dd.get_value(element, ".//Project/Project/ProjectDescr/Name")
-            doc["title"] = dd.get_value(element, ".//Project/Project/ProjectDescr/Title")
-            doc["description"] = dd.get_value(element, ".//Project/ProjectDescr/Description")
-            doc["data type"] = dd.get_value(element, ".//ProjectTypeSubmission/ProjectDataTypeSet/DataType")
-            doc["organization"] = dd.get_value(element, ".//Submission/Description/Organization/Name")
-            doc["publication"] = dd.get_publications(element, ".//Project/ProjectDescr/Publication")
-            doc["properties"] = None
-            doc["dbXrefs"] = dd.get_xattrs(element, ".//Project/ProjectDescr/LocusTagPrefix/@biosample_id")
-            doc["distribution"] = None
-            doc["Download"] = None
-            doc["status"] = dd.get_value(element, ".//Submission/Description/Access")
-            doc["visibility"] = None
-            # Todo: 以下ElasticSearchの項目がDate型なため空の値を登録できない（レコードのインポートがエラーとなりスキップされる）
-            date_created = dd.get_xattr(element, ".//Submission/@submitted")
-            if date_created: doc["dateCreated"] = date_created
-            date_mmodified = dd.get_xattr(element, ".//Submission/@last_update")
-            if date_mmodified: doc["dateModified"] = date_mmodified
-            date_published = dd.get_value(element, ".//Project/ProjectDescr/ProjectReleaseDate")
-            if date_published: doc["datePublished"] = date_published
 
-            # そのままxmltodictで機械的にJSONに変換したい場合以下を実行すしリストに追加する
-            # ただしxmlが部分的にでもマルフォームであった場合エラーが発生する
-            # xml_str = etree.tostring(element)
-            # metadata = xml2json(xml_str)
-            docs.append(doc)
+            # accリストに存在する要素のみ書き出したい場合
+            if select_by_acc.select_bp(doc["identifier"], acc):
 
-            # jsonlを書き出す場合
-            # xml2jsonl.dict2jsnl(doc, "bioproject", f"{output_path}l")
+                doc["organism"] = dd.get_value(element, ".//Project/Project/ProjectDescr/Name")
+                doc["title"] = dd.get_value(element, ".//Project/Project/ProjectDescr/Title")
+                doc["description"] = dd.get_value(element, ".//Project/ProjectDescr/Description")
+                doc["data type"] = dd.get_value(element, ".//ProjectTypeSubmission/ProjectDataTypeSet/DataType")
+                doc["organization"] = dd.get_value(element, ".//Submission/Description/Organization/Name")
+                doc["publication"] = dd.get_publications(element, ".//Project/ProjectDescr/Publication")
+                doc["properties"] = None
+                doc["dbXrefs"] = dd.get_xattrs(element, ".//Project/ProjectDescr/LocusTagPrefix/@biosample_id")
+                doc["distribution"] = None
+                doc["Download"] = None
+                doc["status"] = dd.get_value(element, ".//Submission/Description/Access")
+                doc["visibility"] = None
+                # Todo: 以下ElasticSearchの項目がDate型なため空の値を登録できない（レコードのインポートがエラーとなりスキップされる）
+                date_created = dd.get_xattr(element, ".//Submission/@submitted")
+                if date_created: doc["dateCreated"] = date_created
+                date_mmodified = dd.get_xattr(element, ".//Submission/@last_update")
+                if date_mmodified: doc["dateModified"] = date_mmodified
+                date_published = dd.get_value(element, ".//Project/ProjectDescr/ProjectReleaseDate")
+                if date_published: doc["datePublished"] = date_published
+
+                # そのままxmltodictで機械的にJSONに変換したい場合以下を実行すしリストに追加する
+                # ただしxmlが部分的にでもマルフォームであった場合エラーが発生する
+                # xml_str = etree.tostring(element)
+                # metadata = xml2json(xml_str)
+                # docs.append(doc)
+
+                # 特定の要素のみ取り出したい場合
+                # if doc["identifier"] == "":
+                    #docs.append(doc)
+
+                # jsonlを書き出す場合
+                xml2jsonl.dict2jsnl(doc, "bioproject", f"{output_path}l")
 
         try:
             clear_element(element)
@@ -89,7 +102,7 @@ def bioproject_xml_to_dict(file_path:str, output_path:str):
         i += 1
         '''
     # JSONを書き出す場合
-    write_json(output_path, docs)
+    # write_json(output_path, docs)
 
 
 def bioproject_xml_to_json(file_path: str, output_path:str):
