@@ -122,4 +122,4 @@ def write_json(out_path:str, docs: dict):
 
 
 if __name__ == "__main__":
-    bioproject_xml_to_dict("bioproject.xml", "biproject.json")
+    bioproject_xml_to_dict("bioproject.xml", "bioproject.json")
