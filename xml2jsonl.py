@@ -14,7 +14,8 @@ def dict2jsnl(dct, data_type, output_f):
     """
     # 追記するのでモードで"a"を指定する
     writer = open(output_f, "a")
-    obj = {data_type: dct}
+    # obj = {data_type: dct} # data_typeで囲わない
+    obj = dct
     acc = dct["identifier"]
 
     h = json.dumps({"index": {"_index": data_type, "_type": "metadata", "_id": acc}})
