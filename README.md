@@ -1,6 +1,6 @@
 # bpxml2json
 
-bioproject.xmlをDDBJハッシュテーブルの項目に合わせたJSONに変換するユーティリティです。
+bioproject.xml（ftp.ncbi.nlm.nih.gov/bioproject/bioproject.xml）をDDBJハッシュテーブルの項目に合わせたJSONに変換するユーティリティです。
 ElasticSearchにbulk importするためのjsonl形式の書き出しにも対応しています。
 
 xml2json.pyでxml1レコードごとに必要な要素を取得してxml2jsonl.pyに渡してjsonl line形式で書き出します。
