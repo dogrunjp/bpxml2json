@@ -6,7 +6,7 @@ from lxml import etree
 import xmlutils
 import defaultdictvals
 import xml2jsonl
-import select_by_acc
+#import select_by_acc
 
 
 BIOPROJECT_CONF = {
@@ -45,8 +45,7 @@ def bioproject_xml_to_dict(file_path:str, output_path:str):
 
     context = etree.iterparse(file_path, tag="Package", recover=True)
     dd = defaultdictvals.DefaultDictVal()
-    # i = 0
-    docs = []
+    # docs = []
     for events, element in context:
         if element.tag == "Package":
             doc = {}
@@ -82,11 +81,12 @@ def bioproject_xml_to_dict(file_path:str, output_path:str):
             # metadata = xml2json(xml_str)
             # docs.append(doc)
 
-            # 特定の要素のみ取り出したい場合
+            # 特定の要素のみ取り出して書き出したい場合
             # if doc["identifier"] == "":
                 #docs.append(doc)
 
-            # jsonlを書き出す場合
+            # jsonlを書き出す場合（こちらが本来の用途）
+            # jsonlは1行に1レコードを書き出す形式.1つのJSONオブジェクト毎xml2jsonlに渡して書き出す
             xml2jsonl.dict2jsnl(doc, "bioproject", f"{output_path}l")
 
         try:
@@ -94,19 +94,13 @@ def bioproject_xml_to_dict(file_path:str, output_path:str):
         except TypeError:
             pass
 
-        '''
-        if i > 10:
-            res = {"bioproject": docs}
-            write_json(output_path, docs)
-            break
-        i += 1
-        '''
-    # JSONを書き出す場合
+    # JSONとして変換したメタデータを書き出す場合（ほぼ利用しない）
     # write_json(output_path, docs)
 
 
 def bioproject_xml_to_json(file_path: str, output_path:str):
     """
+    不使用
     bioproject.xmlを機械的に階層構造を保ったままJSONに変換して書き出す
     :param file_path:
     :param output_path:
