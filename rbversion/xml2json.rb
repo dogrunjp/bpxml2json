@@ -196,7 +196,7 @@ class BPXml2Jsonl
 end
 
 print Time.now, " Started\n"
-reader = XmlFileLazyReader.new('C:\Users\iota_\Downloads\bioproject.xml', 'Package', 32768)
+reader = XmlFileLazyReader.new('./bioproject.xml', 'Package', 32768)
 xml2json = BPXml2Jsonl.new('bioproject.json')
 reader.each_element do |elm|
     xml2json.send(elm)
