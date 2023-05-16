@@ -121,7 +121,7 @@ class XmlFileLazyReader
         loop do
             index1 = @buf.index("<#{tag}>", current_index)
             while index1 == nil
-                return nil unless bufnext
+                return nil unless buffer_next
             end
             index2 = @buf.index("<#{tag}>", index1 + tag.length + 1)
             index3 = @buf.index("</#{tag}>", index1 + tag.length + 1)
@@ -197,7 +197,7 @@ end
 
 print Time.now, " Started\n"
 reader = XmlFileLazyReader.new('./bioproject.xml', 'Package', 32768)
-xml2json = BPXml2Jsonl.new('bioproject.json')
+xml2json = BPXml2Jsonl.new('./bioproject.json')
 reader.each_element do |elm|
     xml2json.send(elm)
 end
