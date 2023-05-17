@@ -27,11 +27,11 @@ class BPXml2JsonConverter
             'data type' =>  xml.xpath('.//ProjectTypeSubmission/ProjectDataTypeSet/DataType')[0]&.text,
             'organization' => xml.xpath('.//Submission/Description/Organization/Name')[0]&.text,
             'publication' => xml.xpath('.//Project/ProjectDescr/Publication').map do |elm|
-                {'id' => elm['id'], 'Title' => elm.xpath('Title')[0]&.text}
+                {'id' => elm['id'], 'Title' => elm.xpath('.//Title')&.text}
             end,
             'properties' => nil,
-            'dbXrefs' => xml.xpath('.//Project/ProjectDescr/LocusTagPrefix/@biosample_id').map do |elm|
-                elm.xpath('@biosample_id')
+            'dbXrefs' => xml.xpath('.//Project/ProjectDescr/LocusTagPrefix').map do |elm|
+                elm['biosample_id']
             end,
             'distribution' => nil,
             'Download' => nil,
@@ -40,12 +40,12 @@ class BPXml2JsonConverter
         }
         # 以下、Pythonコードからコピー
         # Todo: 以下ElasticSearchの項目がDate型なため空の値を登録できない（レコードのインポートがエラーとなりスキップされる）
-        submission = xml.xpath('Project/Submission')[0]
+        submission = xml.xpath('.//Project/Submission')[0]
         if submission
             @hash['dateCreated'] = submission['submitted'] if submission['submitted']
             @hash['dateModified'] = submission['last_update'] if submission['last_update']
         end
-        date_published = xml.xpath('Project/ProjectDescr/ProjectReleaseDate')[0]&.text
+        date_published = xml.xpath('.//Project/ProjectDescr/ProjectReleaseDate')[0]&.text
         @hash['datePublished'] = date_published if date_published
     end
 
@@ -144,9 +144,10 @@ class Nokogiri::XML::EnumParse
 end
 
 print Time.now, " Started\n"
+File.delete('bioproject.json')
 c = 0
 reader = Nokogiri::XML::EnumParse
-    .new('C:\Users\iota_\Downloads\bioproject.xml', 'Package')
+    .new('bioproject.xml', 'Package')
     .enumerator
 reader.each do |elm|
     c += 1
