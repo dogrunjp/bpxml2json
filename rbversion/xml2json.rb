@@ -15,7 +15,7 @@ class BPXml2JsonConverter
         begin
             xml = Nokogiri::XML(bp_xml)
         rescue
-            print bp_xml
+            print "#{bp_xml[0..100]}\n(#{xml})"
         end
 
         @hash = {
@@ -143,16 +143,28 @@ class Nokogiri::XML::EnumParse
     end
 end
 
+out_path = 'bioproject.json'
+
+output_ractor = Ractor.new(out_path) do |out_path|
+    json = File.open(out_path, 'a')
+    loop do
+        l = Ractor.receive
+        next unless l
+        break if l == 1
+        json << l
+    end
+end
+
 print Time.now, " Started\n"
-File.delete('bioproject.json')
+File.delete(out_path) rescue nil
 c = 0
 reader = Nokogiri::XML::EnumParse
-    .new('bioproject.xml', 'Package')
+    .new('C:\Users\iota_\Downloads\bioproject.xml', 'Package')
     .enumerator
 reader.each do |elm|
     c += 1
-    json = File.open('bioproject.json', 'a')
-    json << BPXml2JsonConverter.new(elm).to_json_with_meta + "\n"
+    output_ractor.send(BPXml2JsonConverter.new(elm).to_json_with_meta + "\n")
 end
+output_ractor.send(1)
 print "#{c} packages converted.\n"
 print Time.now, " Finished\n"
